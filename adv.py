@@ -75,6 +75,31 @@ def dfs(starting_room, destination_room):
                 dirs.append(direction)
     return dirs
 
+def bfs(starting_room, destination_room):
+    queue = Queue()
+    visited = set()
+    queue.enqueue([starting_room])
+    while queue.size() > 0:
+        path = queue.dequeue()
+        room = path[-1]
+        if room not in visited:
+            if room == destination_room:
+                break
+            visited.add(room)
+            for next_room in list(traversal_graph[room].values()):
+                if next_room != '?':
+                    n_path = list(path)
+                    n_path.append(next_room)
+                    queue.enqueue(n_path)
+
+    # Assign directions based on path
+    dirs = []
+    for i in range(len(path) - 1):
+        for direction, room in traversal_graph[path[i]].items():
+            if room == path[i+1]:
+                dirs.append(direction)
+    return dirs
+
 while isSurrounded() == False:
     current_room = player.current_room.id
 
@@ -90,7 +115,7 @@ while isSurrounded() == False:
             new_room = good_rooms.pop()
             if len(get_paths(new_room)) > 0:
                 found_room = True
-        retrace = dfs(current_room, new_room)
+        retrace = bfs(current_room, new_room)
 
         for move in retrace:
             player.travel(move)
